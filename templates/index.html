@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <title>P&Ce</title>
+    {{ bootstrap.load_css() }}
+    <meta name="theme-color" content="#563d7c">
+    {% endblock %}
+</head>
+<body class="bg-light">
+
+<div class="container">
+    {% block hero %}
+    <div class="py-3 text-center">
+        <h2>P&CE</h2>
+        <p class="lead">Programs & Courses Extractor</p>
+    </div>
+    {% endblock %}
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="upload-tab" data-toggle="tab" href="#upload" role="tab"
+               aria-controls="upload" aria-selected="true" onClick="toggle('upload')">Upload</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="console-tab" data-toggle="tab" href="#console" role="tab" aria-controls="console"
+               aria-selected="false" onClick="toggle('console')">Console</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="download-tab" data-toggle="tab" href="#download" role="tab" aria-controls="download"
+               aria-selected="false" onClick="toggle('download')">Download</a>
+        </li>
+
+    </ul>
+
+
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+            <div class="row text-center justify-content-md-center pt-3">
+                <div class="col-md-9 alert alert-primary" role="alert" id="msg_start" style="display:block">Upload a txt file with course codes - one per line. Then press 'Start'</div>
+                <div class="col-md-9 alert alert-warning" id="msg_progress" style="display:none">There is a file being processed. Click Reset to start again. View Console to watch progress.</div>
+            </div>
+            <div class="row justify-content-md-center" id="upload-area">
+                <div class="col-md-8 order-md-1 card text-center">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <form name="input" action="" method=post enctype=multipart/form-data onsubmit="this.elements['upload'].disabled=true; msg_progress.style.display='block'; msg_start.style.display='none';">
+<!--                                <label for="file" class=".bg-secondary">Text file with course codes</label><br />-->
+                                <input type="file" name="file" id="file">
+                                <input class="btn btn-primary" type="submit" value="Start" name="upload" id="upload"/>
+                                <a href="/" class="btn btn-outline-primary">Reset</a><br /><br />
+                                <input type="text" style="width:100%" placeholder="https://programsandcourses.anu.edu.au/course/" id="base_url" name="base_url"/>
+                                <small id="base_url_help" class="form-text text-muted">Change URL stem for different years</small>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="console" role="tabpanel" aria-labelledby="console-tab">
+            <div class="py-3 container">
+                <div class="row row-cols-4 pre-scrollable bg-dark text-white" style="list-style: none">
+                    <samp class="pt-3">
+                        <ul style="list-style: none;" id="console_msg">
+                            <li class="text-info">Waiting for file to be uploaded..</li>
+                        </ul>
+                    </samp>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="download" role="tabpanel" aria-labelledby="download-tab">
+            <div class="row py-3 text-center justify-content-md-center pt-3">
+                <div class="col-md-9" id="download_msg"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% block scripts %}
+
+<script type="text/javascript">
+    var toggler = "upload";
+    var streamInterval;
+
+    function toggle(choice) {
+        toggler = choice;
+        streamer(choice);
+    }
+
+    function streamer(choice) {
+        clearInterval(streamInterval);
+        toggler = choice;
+        if (toggler == "console") {
+            streamInterval = setInterval(console_msg_streamer, 1000);
+        } else if (toggler == "download"){
+            download_msg_streamer();
+        }
+        else {
+            clearInterval(streamInterval);
+        }
+    }
+
+    function console_msg_streamer(loadXMLDoc) {
+        var xmlhttp;
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                document.getElementById("console_msg").innerHTML = xmlhttp.responseText;
+            }
+        };
+        xmlhttp.open('GET', '{{ url_for('console_msg') }}');
+        xmlhttp.send();
+     }
+
+    function download_msg_streamer(loadXMLDoc) {
+        var xmlhttp;
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                document.getElementById("download_msg").innerHTML = xmlhttp.responseText;
+            }
+        };
+        xmlhttp.open('GET', '{{ url_for('download_msg') }}');
+        xmlhttp.send();
+     }
+
+
+</script>
+
+{{ bootstrap.load_js() }}
+{% endblock %}
+</body>
+</html>

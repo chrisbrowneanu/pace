@@ -1,0 +1,14 @@
+msg: {
+  "session_log_default":"<li class=\"text-primary\">Waiting for file to be uploaded...</li>",
+  "session_log_complete":"<li class=\"text-success\">All done. Click the Download tab for the output...</li>",
+  "session_log_error":"<li class=\"text-warning\">Warning - there were no course codes found in the txt provided.</li>",
+  "session_log_fatal":"<li class=\"text-danger\">Fatal Error - there was a problem with the input files.</li>",
+  "download_msg_default":"<div class =\"alert alert-info\" role=\"alert\">Downloads will become available when the scripts have run. Watch the console.</div>",
+  "download_msg_complete":"<div class =\"alert alert-success\" role=\"alert\">Downloads are ready to go.</div>",
+  "download_msg_url":"<a href=\"/download_file/",
+  "download_msg_url_file":"\" class=\"btn btn-primary\">Download Report</a>",
+  "download_msg_url_archive":"\" class=\"btn btn-primary\">Download Archive</a>",
+  "download_msg_error":"<div class =\"alert alert-warning\" role=\"alert\">Warning - there were no course codes found in the .txt provided.</div>",
+  "download_msg_fatal":"<div class =\"alert alert-danger\" role=\"alert\">Fatal Error - there was a problem with the .txt provided.</div>",
+  "start_again_button":"<a href=\"/\" class=\"btn btn-primary\">Start Again</a>",
+}

@@ -1,0 +1,8 @@
+regex: {
+  "\t":" ", # tabs
+  " +":" ", # double spaces
+  "<div class=\"w-narrow secondary-navigation-wrapper\"> <div class=\"w-narrow secondary-navigation-aside\"> <span class=\"secondary-navigation-aside__heading\">":"\n<h1>",
+  "<div id=\"offerings-and-fees\" class=\"tab-content\">.*":"", #tail
+  "<ul class=\"secondary-navigation nav\">.*<div id=\"overview\" class=\"tab-content\">":"<\/h1>", # front matter
+  "id=\".*?\"":"", # duplicate ids
+}
