@@ -52,8 +52,9 @@
                                 <input type="file" name="file" id="file">
                                 <input class="btn btn-primary" type="submit" value="Start" name="upload" id="upload"/>
                                 <a href="/" class="btn btn-outline-primary">Reset</a><br /><br />
-                                <input type="text" style="width:100%" placeholder="https://programsandcourses.anu.edu.au/course/" id="base_url" name="base_url"/>
-                                <small id="base_url_help" class="form-text text-muted">Change URL stem for different years</small>
+                                <select class="form-control" id="year" name="year">
+                                    <option selected value="">Use current year</option>
+                                </select>
                             </form>
                         </div>
                     </div>
@@ -136,8 +137,21 @@
         xmlhttp.send();
      }
 
+    var selectYear = document.getElementById("year"),
+    currentYear = new Date().getFullYear()
+    startYear = 2013
+
+    for(var i = currentYear; i > startYear; i--) {
+        option = document.createElement('option');
+        option.value = option.text = i;
+        selectYear.add(option);
+        console.log(i)
+    }
+
 
 </script>
+
+
 
 {{ bootstrap.load_js() }}
 {% endblock %}

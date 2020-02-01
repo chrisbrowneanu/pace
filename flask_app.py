@@ -78,12 +78,12 @@ def messaging():
 
 def upload():
     file = request.files['file']
-    url = request.form['base_url']
+    year = request.form['year']
     global base_url
-    if url == "":
+    if year == "":
         base_url = "https://programsandcourses.anu.edu.au/course/"
     else:
-        base_url = url
+        base_url = "https://programsandcourses.anu.edu.au/" + year + "/course/"
 
     if file:
         if allowed_file(file.filename):
