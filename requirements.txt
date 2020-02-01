@@ -30,3 +30,4 @@ uwsgi==2.0.18
 watchdog==0.10.1
 wincertstore==0.2
 WTForms==2.2.1
+gunicorn
