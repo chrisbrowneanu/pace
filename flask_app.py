@@ -1,5 +1,5 @@
-from flask import request, send_file, render_template, Flask
 from flask_bootstrap import Bootstrap
+from flask import request, send_file, render_template, Flask
 import subprocess, os, io, shutil, yaml, pickle
 from datetime import datetime
 
@@ -15,7 +15,7 @@ ALLOWED_EXTENSIONS = set(['txt'])
 global config
 
 app = Flask(__name__)
-Bootstrap(app)
+bootstrap = Bootstrap(app)
 
 
 app.config["DEBUG"] = False
