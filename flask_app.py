@@ -1,5 +1,5 @@
-from flask_bootstrap import Bootstrap
 from flask import request, send_file, render_template, Flask
+from flask_bootstrap import Bootstrap
 import subprocess, os, io, shutil, yaml, pickle
 from datetime import datetime
 
@@ -15,6 +15,8 @@ ALLOWED_EXTENSIONS = set(['txt'])
 global config
 
 app = Flask(__name__)
+Bootstrap(app)
+
 
 app.config["DEBUG"] = False
 
@@ -25,7 +27,6 @@ app.config['TXT_DIR'] = TXT_DIR
 app.config['TMP_DIR'] = TMP_DIR
 
 app.secret_key = "TvF8WJlOIdaAUkeeCxjsJem3X3gHRN8T"
-bootstrap = Bootstrap(app)
 
 # ===========
 # FUNCTIONS
