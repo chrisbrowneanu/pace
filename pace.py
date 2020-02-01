@@ -15,7 +15,6 @@ import yaml
 import fileinput
 import re
 import subprocess
-import shutil
 import pickle
 
 input_file = sys.argv[1]

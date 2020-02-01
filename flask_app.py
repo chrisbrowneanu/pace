@@ -1,6 +1,6 @@
 from flask_bootstrap import Bootstrap
-from flask import request, send_file, redirect, render_template, Flask
-import subprocess, os, io, shutil, pathlib, zipfile, yaml, pickle
+from flask import request, send_file, render_template, Flask
+import subprocess, os, io, shutil, yaml, pickle
 from datetime import datetime
 
 APP_DIR = '/Users/cb/Sites/pace'
