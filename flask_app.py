@@ -2,8 +2,6 @@ from flask_bootstrap import Bootstrap
 from flask import request, send_file, redirect, render_template, Flask
 import subprocess, os, io, shutil, pathlib, zipfile, yaml, pickle
 from datetime import datetime
-from waitress import serve
-from webui import WebUI
 
 APP_DIR = '/Users/cb/Sites/pace'
 JOB_DIR = APP_DIR + '/job'
@@ -16,18 +14,18 @@ ALLOWED_EXTENSIONS = set(['txt'])
 
 global config
 
-app = Flask(__name__)
+application = Flask(__name__)
 
-app.config["DEBUG"] = False
+application.config["DEBUG"] = False
 
-app.config['JOB_DIR'] = JOB_DIR
-app.config['DOWNLOAD_DIR'] = DOWNLOAD_DIR
-app.config['HTML_DIR'] = HTML_DIR
-app.config['TXT_DIR'] = TXT_DIR
-app.config['TMP_DIR'] = TMP_DIR
+application.config['JOB_DIR'] = JOB_DIR
+application.config['DOWNLOAD_DIR'] = DOWNLOAD_DIR
+application.config['HTML_DIR'] = HTML_DIR
+application.config['TXT_DIR'] = TXT_DIR
+application.config['TMP_DIR'] = TMP_DIR
 
-app.secret_key = "TvF8WJlOIdaAUkeeCxjsJem3X3gHRN8T"
-bootstrap = Bootstrap(app)
+application.secret_key = "TvF8WJlOIdaAUkeeCxjsJem3X3gHRN8T"
+bootstrap = Bootstrap(application)
 
 # ===========
 # FUNCTIONS
@@ -38,16 +36,16 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 def reset_files():
-    shutil.rmtree(app.config['JOB_DIR'], ignore_errors=True)
-    shutil.rmtree(app.config['DOWNLOAD_DIR'], ignore_errors=True)
-    os.makedirs(app.config['JOB_DIR'])
-    os.makedirs(app.config['DOWNLOAD_DIR'])
-    os.makedirs(app.config['HTML_DIR'])
-    os.makedirs(app.config['TXT_DIR'])
-    os.makedirs(app.config['TMP_DIR'])
-    with open(app.config['TMP_DIR'] + "/" + "session_log.txt", "w") as out:
+    shutil.rmtree(application.config['JOB_DIR'], ignore_errors=True)
+    shutil.rmtree(application.config['DOWNLOAD_DIR'], ignore_errors=True)
+    os.makedirs(application.config['JOB_DIR'])
+    os.makedirs(application.config['DOWNLOAD_DIR'])
+    os.makedirs(application.config['HTML_DIR'])
+    os.makedirs(application.config['TXT_DIR'])
+    os.makedirs(application.config['TMP_DIR'])
+    with open(application.config['TMP_DIR'] + "/" + "session_log.txt", "w") as out:
         out.write(cfg['msg']['session_log_default'])
-    with open(app.config['TMP_DIR'] + "/" + "download_msg.txt", "w") as out:
+    with open(application.config['TMP_DIR'] + "/" + "download_msg.txt", "w") as out:
         out.write(cfg['msg']['download_msg_default'])
 
 def load_config(file):
@@ -56,24 +54,24 @@ def load_config(file):
     return config_defaults
 
 def messaging():
-    settings = pickle.load(open(app.config['TMP_DIR'] + '/settings.txt', "rb"))
+    settings = pickle.load(open(application.config['TMP_DIR'] + '/settings.txt', "rb"))
     print(settings['exit'])
     if settings['exit'] > 0:
-        with open(app.config['TMP_DIR'] + "/" + "session_log.txt", "a") as out:
+        with open(application.config['TMP_DIR'] + "/" + "session_log.txt", "a") as out:
             out.write(cfg['msg']['session_log_complete'])
-        with open(app.config['TMP_DIR'] + "/" + "download_msg.txt", "w") as out:
+        with open(application.config['TMP_DIR'] + "/" + "download_msg.txt", "w") as out:
             out.write(cfg['msg']['download_msg_complete'])
             out.write(cfg['msg']['download_msg_url'] + this_name + ".zip" + cfg['msg']['download_msg_url_archive'])
     elif settings['exit'] == 0:
-        with open(app.config['TMP_DIR'] + "/" + "session_log.txt", "a") as out:
+        with open(application.config['TMP_DIR'] + "/" + "session_log.txt", "a") as out:
             out.write(cfg['msg']['session_log_error'])
-        with open(app.config['TMP_DIR'] + "/" + "download_msg.txt", "w") as out:
+        with open(application.config['TMP_DIR'] + "/" + "download_msg.txt", "w") as out:
             out.write(cfg['msg']['download_msg_error'])
             out.write(cfg['msg']['start_again_button'])
     else:
-        with open(app.config['TMP_DIR'] + "/" + "session_log.txt", "a") as out:
+        with open(application.config['TMP_DIR'] + "/" + "session_log.txt", "a") as out:
             out.write(cfg['msg']['session_log_fatal'])
-        with open(app.config['TMP_DIR'] + "/" + "download_msg.txt", "w") as out:
+        with open(application.config['TMP_DIR'] + "/" + "download_msg.txt", "w") as out:
             out.write(cfg['msg']['download_msg_fatal'])
             out.write(cfg['msg']['start_again_button'])
 
@@ -88,7 +86,7 @@ def upload():
 
     if file:
         if allowed_file(file.filename):
-            file_dir = os.path.join(app.config['JOB_DIR'], 'codes.txt')
+            file_dir = os.path.join(application.config['JOB_DIR'], 'codes.txt')
             file.save(file_dir)
             return ('', 205)
         else:
@@ -98,12 +96,12 @@ def cleaner():
     global this_name
     now = datetime.now()
     this_name = now.strftime("%Y%m%d%H%M%S")
-    shutil.make_archive(app.config['DOWNLOAD_DIR'] + "/" + this_name, 'zip', app.config['JOB_DIR'])
-    shutil.rmtree(app.config['HTML_DIR'], ignore_errors=True)
-    shutil.rmtree(app.config['TXT_DIR'], ignore_errors=True)
+    shutil.make_archive(application.config['DOWNLOAD_DIR'] + "/" + this_name, 'zip', application.config['JOB_DIR'])
+    shutil.rmtree(application.config['HTML_DIR'], ignore_errors=True)
+    shutil.rmtree(application.config['TXT_DIR'], ignore_errors=True)
 
 def processing():
-    this_file = os.path.join(app.config['JOB_DIR'], 'codes.txt')
+    this_file = os.path.join(application.config['JOB_DIR'], 'codes.txt')
     print(this_file)
     print(base_url)
     subprocess.call("python3 pace.py " + this_file + " " + base_url, shell=True)
@@ -113,7 +111,7 @@ def processing():
 # VIEWS
 # ===========
 
-@app.route('/', methods=['GET', 'POST'])
+@application.route('/', methods=['GET', 'POST'])
 def index():
     reset_files()
     if request.method == 'POST':
@@ -125,31 +123,31 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/console_msg')
+@application.route('/console_msg')
 def console_msg():
     def generate():
-        with open(app.config['TMP_DIR'] + '/session_log.txt') as f:
+        with open(application.config['TMP_DIR'] + '/session_log.txt') as f:
             while True:
                 content = f.read()
                 return content
-    return app.response_class(generate(), mimetype='text/plain')
+    return application.response_class(generate(), mimetype='text/plain')
 
-@app.route('/download_msg')
+@application.route('/download_msg')
 def download_msg():
     def generate_msg():
-        with open(app.config['TMP_DIR'] + '/download_msg.txt') as f:
+        with open(application.config['TMP_DIR'] + '/download_msg.txt') as f:
             while True:
                 content = f.read()
                 return content
-    return app.response_class(generate_msg(), mimetype='text/plain')
+    return application.response_class(generate_msg(), mimetype='text/plain')
 
-@app.route('/error')
+@application.route('/error')
 def error():
     return render_template('error.html')
 
-@app.route('/download_file/<filename>')
+@application.route('/download_file/<filename>')
 def download_remove_file(filename):
-    file_path = os.path.join(app.config['DOWNLOAD_DIR'], filename)
+    file_path = os.path.join(application.config['DOWNLOAD_DIR'], filename)
     return_data = io.BytesIO()
     with open(file_path, 'rb') as file_out:
         return_data.write(file_out.read())
@@ -161,14 +159,14 @@ def download_remove_file(filename):
         as_attachment=True,
         attachment_filename=filename)
 
-@app.route('/download_archive/<filename>')
+@application.route('/download_archive/<filename>')
 def download_remove_archive(filename):
-    path = os.path.join(app.config['DOWNLOAD_DIR'], filename)
+    path = os.path.join(application.config['DOWNLOAD_DIR'], filename)
     def generate():
         with open(path) as f:
             yield from f
         os.remove(path)
-    r = app.response_class(generate(), mimetype='application/zip')
+    r = application.response_class(generate(), mimetype='application/zip')
     r.headers.set('Content-Disposition', 'attachment', filename=filename)
     return r
 
@@ -176,5 +174,5 @@ def download_remove_archive(filename):
 cfg = load_config("./includes/yml/messages.yml")
 
 if __name__ == '__main__':
-    # app.run()
-    serve(app, host='0.0.0.0', port=8080)
+    # application.run()
+    application.run()

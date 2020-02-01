@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# python ./pace.py
+# python ./wsgi.py
 #
 #
 # chris.browne@anu.edu.au - all care and no responsibility :)
