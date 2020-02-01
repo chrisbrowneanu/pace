@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# python ./sCraPe.py
+# python ./pace.py
 #
 #
 # chris.browne@anu.edu.au - all care and no responsibility :)

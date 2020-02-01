@@ -17,7 +17,6 @@ ALLOWED_EXTENSIONS = set(['txt'])
 global config
 
 app = Flask(__name__)
-# app = WebUI(app, debug=True)
 
 app.config["DEBUG"] = False
 
@@ -177,4 +176,5 @@ def download_remove_archive(filename):
 cfg = load_config("./includes/yml/messages.yml")
 
 if __name__ == '__main__':
-    app.run()
+    # app.run()
+    serve(app, host='0.0.0.0', port=8080)
