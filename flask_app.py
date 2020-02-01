@@ -3,7 +3,7 @@ from flask import request, send_file, render_template, Flask
 import subprocess, os, io, shutil, yaml, pickle
 from datetime import datetime
 
-APP_DIR = '/Users/cb/Sites/pace'
+APP_DIR = os.getcwd()
 JOB_DIR = APP_DIR + '/job'
 DOWNLOAD_DIR = APP_DIR + '/download'
 HTML_DIR = JOB_DIR + '/html'
