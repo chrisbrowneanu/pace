@@ -62,11 +62,16 @@
             </div>
         </div>
         <div class="tab-pane fade" id="console" role="tabpanel" aria-labelledby="console-tab">
+            <div class="row text-center justify-content-md-center pt-3">
+                <div class="col-md-9 alert alert-secondary" role="alert" id="msg_refresh" style="display:block">
+                    The console times out after 30 seconds. Switch between tabs to refresh.
+                </div>
+            </div>
             <div class="py-3 container">
                 <div class="row row-cols-4 pre-scrollable bg-dark text-white" style="list-style: none">
                     <samp class="pt-3">
                         <ul style="list-style: none;" id="console_msg">
-                            <li class="text-info">Waiting for file to be uploaded..</li>
+                            <li class="text-warning">Waiting for file to be uploaded..</li>
                         </ul>
                     </samp>
                 </div>
@@ -86,9 +91,11 @@
 <script type="text/javascript">
     var toggler = "upload";
     var streamInterval;
+    var timesRun;
 
     function toggle(choice) {
         toggler = choice;
+        console.log(choice)
         streamer(choice);
     }
 
@@ -96,6 +103,8 @@
         clearInterval(streamInterval);
         toggler = choice;
         if (toggler == "console") {
+            timesRun = 0;
+            console.log(timesRun)
             streamInterval = setInterval(console_msg_streamer, 1000);
         } else if (toggler == "download"){
             download_msg_streamer();
@@ -105,8 +114,14 @@
         }
     }
 
+
     function console_msg_streamer(loadXMLDoc) {
         var xmlhttp;
+        timesRun += 1;
+        console.log(timesRun)
+        if(timesRun === 30){
+                toggle('off');
+            }
         if (window.XMLHttpRequest) {
             xmlhttp = new XMLHttpRequest();
         } else {
@@ -145,13 +160,9 @@
         option = document.createElement('option');
         option.value = option.text = i;
         selectYear.add(option);
-        console.log(i)
     }
 
-
 </script>
-
-
 
 {{ bootstrap.load_js() }}
 {% endblock %}

@@ -17,7 +17,6 @@ global config
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
 
-
 app.config["DEBUG"] = False
 
 app.config['JOB_DIR'] = JOB_DIR
