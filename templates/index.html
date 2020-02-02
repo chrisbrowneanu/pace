@@ -95,7 +95,6 @@
 
     function toggle(choice) {
         toggler = choice;
-        console.log(choice)
         streamer(choice);
     }
 
@@ -104,7 +103,6 @@
         toggler = choice;
         if (toggler == "console") {
             timesRun = 0;
-            console.log(timesRun)
             streamInterval = setInterval(console_msg_streamer, 1000);
         } else if (toggler == "download"){
             download_msg_streamer();
@@ -118,7 +116,6 @@
     function console_msg_streamer(loadXMLDoc) {
         var xmlhttp;
         timesRun += 1;
-        console.log(timesRun)
         if(timesRun === 30){
                 toggle('off');
             }
