@@ -1,7 +1,7 @@
 PyYAML==5.3
 blinker==1.4
 brotli==1.0.7
-cryptography==2.8
+cryptography==3.2
 Cython==0.29.14
 eventlet==0.25.1
 gevent==1.4.0
