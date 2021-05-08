@@ -3,7 +3,7 @@ blinker==1.4
 brotli==1.0.7
 cryptography==2.8
 Cython==0.29.14
-eventlet==0.25.1
+eventlet==0.31.0
 gevent==1.4.0
 greenlet==0.4.15
 inotify==0.2.10
