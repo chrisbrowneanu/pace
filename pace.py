@@ -190,12 +190,25 @@ def html_to_yml():
                    'requisite',
                    ]
 
-    
 
-    'learning-outcomes',
-    'indicative-assessment',
+    iterate_dict(out_dict, out_learning_outcomes, 'learning-outcomes')
 
-    convert_csv(dict, out_courses, field_names)
+    convert_csv(out_dict, out_courses, field_names)
+
+
+def iterate_dict(dict, out_file, field_name):
+    this_dict = []
+    for item in dict:
+        for key, val in item.items():
+            if key == 'course-code':
+                this_course = val
+            if key == field_name:
+                for k,v in val.items():
+                    this_dict.update({'course-code': this_course, field_name + '-id': k, field_name: v})
+    field_names = ['course-code',
+                   field_name + '-id',
+                   field_name]
+    convert_csv(this_dict, out_file, field_names)
 
 
 def convert_csv(dict, out_file, field_names):
