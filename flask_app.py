@@ -9,6 +9,7 @@ DOWNLOAD_DIR = APP_DIR + '/download'
 HTML_DIR = JOB_DIR + '/html'
 TXT_DIR = JOB_DIR + '/txt'
 TMP_DIR = JOB_DIR + '/tmp'
+MD_DIR = JOB_DIR + '/md'
 
 ALLOWED_EXTENSIONS = set(['txt'])
 
@@ -24,6 +25,7 @@ app.config['DOWNLOAD_DIR'] = DOWNLOAD_DIR
 app.config['HTML_DIR'] = HTML_DIR
 app.config['TXT_DIR'] = TXT_DIR
 app.config['TMP_DIR'] = TMP_DIR
+app.config['MD_DIR'] = MD_DIR
 
 app.secret_key = "TvF8WJlOIdaAUkeeCxjsJem3X3gHRN8T"
 
@@ -43,6 +45,7 @@ def reset_files():
     os.makedirs(app.config['HTML_DIR'])
     os.makedirs(app.config['TXT_DIR'])
     os.makedirs(app.config['TMP_DIR'])
+    os.makedirs(app.config['MD_DIR'])
     with open(app.config['TMP_DIR'] + "/" + "session_log.txt", "w") as out:
         out.write(cfg['msg']['session_log_default'])
     with open(app.config['TMP_DIR'] + "/" + "download_msg.txt", "w") as out:
@@ -113,11 +116,11 @@ def processing():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    reset_files()
+    # reset_files()
     if request.method == 'POST':
         upload()
         processing()
-        cleaner()
+        # cleaner()
         messaging()
         return ('', 205)
     return render_template('index.html')

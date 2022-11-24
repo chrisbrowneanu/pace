@@ -16,6 +16,12 @@ import fileinput
 import re
 import subprocess
 import pickle
+import glob
+from shutil import copyfile
+from bs4 import BeautifulSoup
+from pandas import DataFrame
+import csv
+
 
 input_file = sys.argv[1]
 BASE_URL = sys.argv[2]
@@ -27,9 +33,7 @@ def main():
     print_log("Using " + BASE_URL, "warning")
     check_codes()
     html_retrieve(input_file)
-    remove_newlines(out)
-    process_regex(out)
-    pandoc_html()
+    html_to_yml()
     this_pickle(len(course_codes))
     print_log("Process complete! Ready to Download", "success")
 
@@ -40,6 +44,7 @@ def file_directory(file):
     basename = str(this_file.stem)
     directory = str(this_file.parent)
     extension = str(this_file.suffix)
+    print(directory)
 
 def setup_files():
     global cfg, out, session_log, error_log
@@ -58,6 +63,7 @@ def check_codes():
     for line in fread:
         line = line.rstrip()
         course_codes.append(line.rstrip())
+    print(course_codes)
     count_course_codes = len(course_codes)
     print(count_course_codes)
     if count_course_codes == 0:
@@ -70,21 +76,25 @@ def html_retrieve(file):
     codes = open(file)
     for code in codes:
         this_code = code.rstrip()
-        this_html = directory + "/html/" + this_code + ".html"
+        this_html = directory + "/html" + this_code + ".html"
+        print(this_html)
         html_exists = os.path.isfile(this_html)
-        if not html_exists:
+        if html_exists:
+            print_log(this_code + " already exists..", "success")
+        else:
             url = BASE_URL + this_code
+            print(url)
             response = urllib.request.urlopen(url)
             response_url = response.geturl()
             content = response.read()
             html_write(this_html, content)
-        if url == response_url:
-            print_log(this_code + " retrieved...OK", "success")
-            copy_sub_text(this_html)
-        else:
-            print_log("ERROR! " + this_code + " was not retrieved. Check the input file.", "danger")
-            with open(error_log, "a"):
-                print(this_code, " error")
+            if url == response_url:
+                print_log(this_code + " retrieved...OK", "success")
+                copy_sub_text(this_html)
+            else:
+                print_log("ERROR! " + this_code + " was not retrieved. Check the input file.", "danger")
+                with open(error_log, "a"):
+                    print(this_code, " error")
 
 def html_write(file, content):
     with open(file, "wb") as html_write:
@@ -130,8 +140,121 @@ def pandoc_html():
     except Exception:
         print("Unable to create feedback file", "danger")
 
+def html_to_yml():
+    print(directory)
+    out_courses = directory + "/courses.csv"
+    out_learning_outcomes = directory + "/learning-outcomes.csv"
+    out_assessment = directory + "/assessment.csv"
+    out_dict = []
+    for filename in sorted(glob.glob(directory + "/html/2023/course/*.html")):
+        this_file = Path(filename)
+        print(this_file)
+        this_basename = str(this_file.stem)
+        out_yml = directory + "/yml/" + this_basename + ".yml"
+        dict = {}
+        with open(filename, 'r') as f:
+            contents = f.read()
+            soup = BeautifulSoup(contents, 'lxml')
+
+            # course level
+            course_meta('course-name', soup, dict)
+            course_meta('course-code', soup, dict)
+            course_meta('course-year', soup, dict)
+
+            try:
+                summary_codes_id = soup.find(class_="degree-summary__codes")
+                clean_codes(summary_codes_id, dict)
+            except:
+                break
+
+            course_text('introduction', soup, dict)
+            course_text('requisite', soup, dict)
+            course_list('learning-outcomes', soup, dict)
+            course_list('indicative-assessment', soup, dict)
+
+        print(dict)
+        out_dict.append(dict)
+
+        f = open(out_yml, 'w+')
+        yaml.dump(dict, f, allow_unicode=True)
+
+    field_names = ['course-code',
+                   'course-name',
+                   'course-year',
+                   'Offered by',
+                   'Course subject',
+                   'Areas of interest',
+                   'Academic career',
+                   'Course convener',
+                   'introduction',
+                   'requisite',
+                   ]
+
+    
+
+    'learning-outcomes',
+    'indicative-assessment',
+
+    convert_csv(dict, out_courses, field_names)
+
+
+def convert_csv(dict, out_file, field_names):
+    with open(out_file, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=field_names, extrasaction='ignore')
+        writer.writeheader()
+        writer.writerows(dict)
 
 ## helper functions
+
+def course_meta(key, text, dict):
+    if key:
+        try:
+            val = text.find('meta', {'name': key}).get('content')
+            dict.update({key: val})
+        except:
+            dict.update({key: ""})
+
+def course_text(key, text, dict):
+    if key:
+        try:
+            html = text.find("div", {"id": key})
+            this_text = html.text
+            lines = (line.strip() for line in this_text.splitlines())
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            val = '\n'.join(chunk for chunk in chunks if chunk)
+            dict.update({key: val})
+        except:
+            dict.update({key: ""})
+
+def course_list(key, text, dict):
+    count = 1
+    this_dict = {}
+    if key:
+        try:
+            html = text.find("h2", {"id": key})
+            list = html.find_next("ol")
+            for item in list.find_all("li"):
+                list = str(count)
+                val = str(item.text)
+                this_dict.update({list: val})
+                count += 1
+        except:
+            this_dict.update({"list": "None"})
+
+        dict.update({key: this_dict})
+
+
+def clean_codes(string, dict):
+    if string:
+        try:
+            text = string.findAll('li')
+            for li in text:
+                key = li.find('span', {'class':'degree-summary__code-heading'})
+                val = li.find('span', {'class':'degree-summary__code-text'})
+                dict.update({key.text: val.text})
+        except:
+            dict.update({"": ""})
+        return out
 
 def this_pickle(count):
     settings = {"exit": count}
