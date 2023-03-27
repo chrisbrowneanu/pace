@@ -21,7 +21,7 @@ pylibmc==1.6.1
 pyOpenSSL==19.1.0
 python-dotenv==0.10.5
 python_memcached==1.59
-redis==3.4.0
+redis==4.5.3
 setproctitle==1.1.10
 simplejson==3.17.0
 termcolor==1.1.0
